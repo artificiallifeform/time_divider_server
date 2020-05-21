@@ -1,11 +1,20 @@
 require('dotenv').config();
 const express = require('express');
-const mysql = require('mysql');
-const connection = mysql.createConnection()
+
 const mongoConnect = require('./utils/db').mongoConnect;
+const connection = require('./utils/sql_db');
 
 const authRoute = require('./routes/authRoute');
 const exerciseRoute = require('./routes/exerciseRoute');
+
+// Connection to mysql
+connection.connect(err => {
+  if(err) {
+    console.log('error while connection to mysql' + err.stack);
+    return;
+  }
+  console.log('Connected as id' + connection.threadId);
+});
 
 const app = express();
 

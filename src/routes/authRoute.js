@@ -1,24 +1,25 @@
 const router = require('express').Router();
-const getDb = require('../utils/db').getDb;
+const connection = require('../utils/sql_db');
 
 router.post('/', async (req, res) => {
   const { username } = req.body;
-  console.log(username);
-  const db = getDb();
-  const collection = db.collection('users');
+  const find_user = 'SELECT username FROM users WHERE username=?';
+  const insert_user = 'INSERT INTO users(username) VALUES(?)'
 
-  try {
-    const response = await collection.findOne({ username }, { projection: { _id: 0 } });
-    if(response) {
-      return res.status(200).json({ user: response });
-    } else {
-      const response2 = await collection.insertOne({ username });
-      return res.status(200).json({ user: response2.ops[0] });
-    }
+  connection.query(find_user, [username] ,(err, results) => {
+    if (err) throw err;
 
-  } catch (err) {
-    return res.status(500).send('Server Error');
-  }
+    if(results.length > 0) {
+      console.log(results);
+      return res.status(200).json({ username: results[0].username });
+    } 
+    
+    connection.query(insert_user, [username], (err, results) => {
+      if (err) throw err;
+      console.log(results);
+      return res.status(201).json({ username: username });
+    });
+  });
 });
 
 module.exports = router;
