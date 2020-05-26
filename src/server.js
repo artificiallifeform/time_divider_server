@@ -1,7 +1,6 @@
 require('dotenv').config();
 const express = require('express');
 
-const mongoConnect = require('./utils/db').mongoConnect;
 const connection = require('./utils/sql_db');
 
 const authRoute = require('./routes/authRoute');
@@ -30,10 +29,8 @@ app.use('/auth', authRoute);
 app.use('/exercise', exerciseRoute);
 
 const PORT = process.env.PORT;
-mongoConnect(() => {
-  app.listen(PORT, () => {
-    console.log('Server up and running');
-  });
-})
+app.listen(PORT, () => {
+  console.log('Server is up and running');
+});
 
 // mongo "mongodb+srv://cluster0-renrv.mongodb.net/test"  --username egor2
