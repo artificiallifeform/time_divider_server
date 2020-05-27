@@ -86,4 +86,15 @@ router.get('/getexercise', async (req, res) => {
   }
 });
 
+router.delete('/', async (req, res) => {
+  const exercise_id = parseInt(req.query.exercise_id);
+  const q = 'DELETE FROM exercises WHERE id=?'
+  connection.query(q, [exercise_id], (err, results) => {
+    if (err) {
+      return res.status(500).send('Failed To Delete Resource');
+    }
+    return res.status(204).send('Resource Deleted Successfully');
+  });
+});
+
 module.exports = router;
