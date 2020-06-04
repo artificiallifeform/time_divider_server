@@ -97,4 +97,31 @@ router.delete('/', async (req, res) => {
   });
 });
 
+router.get('/exercisetitles', async(req, res) => {
+  const user_id = parseInt(req.query.user_id);
+  const val = req.query.val;
+
+
+  const get_titles = (user_id, val) => {
+    let q = 'SELECT title, user_id FROM exercises WHERE user_id=? AND title LIKE ? GROUP BY title'
+    if (!val) {
+      q = 'SELECT title, user_id, COUNT(*) as times FROM exercises GROUP BY title ORDER BY times DESC LIMIT 5'
+    }
+    return new Promise((resolve, reject) => {
+      connection.query(q, [user_id, `%${val}%`], (err, results) => {
+        if(err) reject(err);
+        resolve(results);
+      });
+    });
+  }
+  
+  try {
+    const response = await get_titles(user_id, val);
+    return res.status(200).json({titles: response});
+  } catch (error) { 
+    console.log(error);
+    return res.status(500).send('Server Error. Something wrong with fetching titles');
+  }
+});
+
 module.exports = router;
