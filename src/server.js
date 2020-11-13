@@ -1,5 +1,6 @@
 require("dotenv").config();
 const express = require("express");
+const path = require("path");
 
 const connection = require("./utils/sql_db");
 
@@ -7,6 +8,7 @@ const authRoute = require("./routes/authRoute");
 const exerciseRoute = require("./routes/exerciseRoute");
 const statistcsRoute = require("./routes/statisticsRoute");
 const goalsRoute = require("./routes/goalsRoute");
+const goalsHistoryRoute = require("./routes/goalsHistoryRoute");
 
 const init_tables = {
   exercises_table: `CREATE TABLE IF NOT EXISTS exercises(
@@ -51,14 +53,18 @@ app.use((req, res, next) => {
 });
 
 app.use(express.json({ extended: false }));
-app.use("/auth", authRoute);
-app.use("/exercise", exerciseRoute);
-app.use("/statistics", statistcsRoute);
-app.use("/goals", goalsRoute);
+app.use("/api/auth", authRoute);
+app.use("/api/exercise", exerciseRoute);
+app.use("/api/statistics", statistcsRoute);
+app.use("/api/goals", goalsRoute);
+app.use("/api/goalshistory", goalsHistoryRoute);
+
+app.use(express.static(__dirname + "/dist"));
+app.get("*", (req, res) => {
+  res.sendFile(path.resolve(__dirname, "dist", "index.html"));
+});
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log("Server is up and running");
 });
-
-// mongo "mongodb+srv://cluster0-renrv.mongodb.net/test"  --username egor2

@@ -65,7 +65,6 @@ router.get("/", async (req, res) => {
   try {
     const response_stat = await get_statistics(user_id, title);
     const response_time = await get_total(user_id, title);
-    console.log(response_stat, response_time);
     return res
       .status(200)
       .json({ stats: response_stat, total_time: response_time[0] });

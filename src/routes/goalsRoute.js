@@ -34,7 +34,6 @@ router.post("/", async (req, res) => {
       title,
       goal_time
     );
-    console.log(goal_id);
     return res.status(200).json({ goal_id });
   } catch (err) {
     return res
@@ -46,7 +45,7 @@ router.post("/", async (req, res) => {
 router.get("/", async (req, res) => {
   const get_goals = (user_id, date) => {
     const q =
-      "SELECT title, time_spent, goal_time, expiration FROM goals WHERE user_id=? AND expiration >= FROM_UNIXTIME(?) AND expired = 0";
+      "SELECT title, time_spent, goal_time, expiration, id FROM goals WHERE user_id=? AND expiration >= FROM_UNIXTIME(?) AND expired = 0";
 
     return new Promise((resolve, reject) => {
       connection.query(q, [user_id, date], (err, results) => {
@@ -76,6 +75,53 @@ router.get("/", async (req, res) => {
     res
       .status(500)
       .send("Server Error. Something wrong with DB on fetching goals list");
+  }
+});
+
+router.post("/expire", async (req, res) => {
+  const { date, user_id } = req.body;
+
+  const set_expired = (date, user_id) => {
+    const q =
+      "UPDATE goals SET expired=1 WHERE user_id=? AND expiration < FROM_UNIXTIME(?)";
+
+    return new Promise((resolve, reject) => {
+      connection.query(q, [user_id, date], (err, results) => {
+        if (err) reject(err);
+        resolve(results);
+      });
+    });
+  };
+
+  try {
+    await set_expired(date, user_id);
+    return res.status(202).send("Updated Successfully");
+  } catch (error) {
+    return res.status(500).send("Error while set expired on login");
+  }
+});
+
+router.delete("/", async (req, res) => {
+  const { id, user_id } = req.body;
+
+  const delete_goal = (user_id, id) => {
+    const q = "DELETE FROM goals WHERE user_id=? AND id=?";
+
+    return new Promise((resolve, reject) => {
+      connection.query(q, [user_id, id], (err, results) => {
+        if (err) reject(err);
+        resolve(results);
+      });
+    });
+  };
+
+  try {
+    await delete_goal(user_id, id);
+    res.status(200).send("Goal deleted");
+  } catch (error) {
+    res
+      .status(500)
+      .send("Server Error. Something went wrong deleting the goal");
   }
 });
 

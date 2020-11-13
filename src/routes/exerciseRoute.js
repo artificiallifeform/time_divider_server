@@ -84,7 +84,6 @@ router.post("/", async (req, res) => {
     // and assing to this exercises
     // When saving this exercises next time it's already has id property
     const found_goal = await find_goal(last_update, user_id, title);
-    console.log(found_goal);
     if (!exercise_id) {
       const inserted_result = await insert_exercise(
         user_id,
@@ -193,7 +192,6 @@ router.get("/exercisetitles", async (req, res) => {
     const response = await get_titles(user_id, val);
     return res.status(200).json({ titles: response });
   } catch (error) {
-    console.log(error);
     return res
       .status(500)
       .send("Server Error. Something wrong with fetching titles");
